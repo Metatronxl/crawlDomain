@@ -20,7 +20,7 @@ def getinfo(webaddress):
     if os.path.exists(websitefilepath):  # 如果此文件夹已经存在就将其删除，原因是如果它存在，那么爬虫将不成功
         shutil.rmtree(websitefilepath)  # shutil.rmtree函数用于删除文件夹（其中含有文件）
     outputfilepath = os.path.abspath('.') + '/webFile/' + 'output.txt'  # 在当前文件夹下创建一个过渡性质的文件output.txt
-    fobj = open(outputfilepath, 'w+', encoding='utf-8')
+    fobj = open(outputfilepath, 'w+')
     command = 'wget -r -m -nv --no-check-certificate --reject=' + REJECT_FILETYPE + ' -o ' + outputfilepath + ' ' + url  # 利用wget命令爬取网站
     tmp0 = os.popen(command).readlines()  # 函数os.popen执行命令并且将运行结果存储在变量tmp0中
     print(fobj, tmp0)  # 写入output.txt中
@@ -39,7 +39,7 @@ def getinfo(webaddress):
 def readAlexaList():
 
     p = Pool()
-    with open('alexa1000.txt', 'r', encoding='utf-8') as f:
+    with open('alexa1000.txt', 'r') as f:
         alexaList = f.readlines()
         for alexaWeb in alexaList:
             detailAlexWeb = alexaWeb.split(" ")
