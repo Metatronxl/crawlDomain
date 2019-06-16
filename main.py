@@ -6,8 +6,10 @@ import os
 import re
 import shutil
 from multiprocessing import Pool
+import time
 
 REJECT_FILETYPE = 'rar,7z,jpg,jpeg,gif,bmp,png,swf,exe'  # 定义爬虫过程中不下载的文件类型
+domain_count = 0
 
 
 def getinfo(webaddress):
@@ -16,10 +18,10 @@ def getinfo(webaddress):
     url = 'http://' + webaddress + '/'  # 通过用户输入的网址连接上网络协议，得到URL。
     print('Getting>>>>> ' + url)  # 打印提示信息，表示正在抓取网站
     websitefilepath = os.path.abspath(
-        '.') + '/webFile/' + webaddress  # 通过函数os.path.abspath得到当前程序所在的绝对路径，然后搭配用户所输入的网址得到用于存储下载网页的文件夹
+        '.') + '/' + webaddress  # 通过函数os.path.abspath得到当前程序所在的绝对路径，然后搭配用户所输入的网址得到用于存储下载网页的文件夹
     if os.path.exists(websitefilepath):  # 如果此文件夹已经存在就将其删除，原因是如果它存在，那么爬虫将不成功
         shutil.rmtree(websitefilepath)  # shutil.rmtree函数用于删除文件夹（其中含有文件）
-    outputfilepath = os.path.abspath('.') + '/webFile/' + 'output.txt'  # 在当前文件夹下创建一个过渡性质的文件output.txt
+    outputfilepath = os.path.abspath('.') + '/' + 'output.txt'  # 在当前文件夹下创建一个过渡性质的文件output.txt
     fobj = open(outputfilepath, 'w+')
     command = 'wget -r -m -nv --no-check-certificate --reject=' + REJECT_FILETYPE + ' -o ' + outputfilepath + ' ' + url  # 利用wget命令爬取网站
     tmp0 = os.popen(command).readlines()  # 函数os.popen执行命令并且将运行结果存储在变量tmp0中
@@ -37,7 +39,8 @@ def getinfo(webaddress):
 
 
 def readAlexaList():
-
+    start_time = time.time()
+    global domain_count
     p = Pool()
     with open('alexa1000.txt', 'r') as f:
         alexaList = f.readlines()
@@ -45,14 +48,31 @@ def readAlexaList():
             detailAlexWeb = alexaWeb.split(" ")
             censored = detailAlexWeb[1]
             if str(censored).startswith("0%"):  # 剔除所有被审查的网站
-                print(detailAlexWeb[0] + '===' + detailAlexWeb[1])
-                getinfo(detailAlexWeb[0]) # 下载网站
+                domain_count +=1
+                # getinfo(detailAlexWeb[0]) # 下载网站
                 p.apply_async(getinfo,args=(detailAlexWeb[0],))
 
         p.close()
         p.join()
     print("All subprocesses web download done")
+    print("total domain number: "+domain_count)
     f.close()
+
+    end_time = time.time()
+
+    averget_time = (end_time-start_time)/domain_count
+
+    print "start time: "+start_time
+    print "end time: "+end_time
+    print "average time" + averget_time
+
+    with open("time_result.txt",'w+') as f:
+        f.writelines("start time: "+start_time)
+        f.writelines("end time: "+end_time)
+        f.writelines("average time" + averget_time)
+        f.writelines("domaincount: " + domain_count)
+    f.close()
+
 
 
 if __name__ == "__main__":

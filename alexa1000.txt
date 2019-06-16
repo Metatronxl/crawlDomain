@@ -188,8 +188,6 @@ skype.com 100%
 twitch.tv 59%
 bing.com 50%
 baidu.com 0%
-wikipedia.org 0%
-yahoo.com 0%
 qq.com 0%
 tmall.com 0%
 jd.com 50%
